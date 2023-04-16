@@ -31,14 +31,15 @@ def loading_txt (file):
 
 # Make a prediction with weights
 def predict(row, weights):
-    activation = 0 #bias
+    activation = 0 
     for i in range(len(row)-1):
-        activation += weights[i + 1] * row[i] 
+        activation += weights[i + 1] * row[i] # weight * column in data row
     activation += weights[0] #bias
     if activation >= 0.0:
         return 1.0
     else:
-        return 0.0
+        return 0.0  
+
 
 # Estimate Perceptron weights using stochastic gradient descent
 def train_weights(train_dataset, l_rate, n_epoch, weights):
@@ -47,10 +48,11 @@ def train_weights(train_dataset, l_rate, n_epoch, weights):
     matrix=list()
     matrix=[[0 for i in range(2)] for j in range(2)]
 
-    for epoch in range(n_epoch):
+    #start calculating
+    for epoch in range(n_epoch): #calculate epoch times
         sum_error = 0.0
         for row in train_dataset:
-            prediction = predict(row, weights)
+            prediction = predict(row, weights)  
             error = row[-1] - prediction #error = expected - predicted. 0-OK   1-BAD
             
             #at last epoch, take data into confusion matrix
@@ -115,3 +117,5 @@ perceptron_banknote_authentication(file_name, l_rate, n_epoch,weights)
 
 
 
+#podzielic na 2 zbiory: treningowy i testowy 80% i 20%
+# zmienic na -1 funkcja signum na returnie, zamiast 0. Czyli zwraca 1 albo -1 (teraz mam 1 i 0)
