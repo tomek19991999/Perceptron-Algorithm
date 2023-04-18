@@ -32,8 +32,12 @@ def loading_txt (file):
 # Make a prediction with weights
 def predict(row, weights):
     activation = 0 
-    for i in range(len(row)-1):
-        activation += weights[i + 1] * row[i] # weight * column in data row
+    if(len(row)==5):
+        for i in range(len(row)-1):
+            activation += weights[i + 1] * row[i] # weight * column in data row
+    else:
+        for i in range(len(row)):
+            activation += weights[i + 1] * row[i] # weight * column in data row
     activation += weights[0] #bias
     if activation >= 0.0:
         return 1.0
@@ -43,10 +47,6 @@ def predict(row, weights):
 
 # Estimate Perceptron weights using stochastic gradient descent
 def train_weights(train_dataset, l_rate, n_epoch, weights):
-    #creating list for confusion matrix
-    arr = [[0 for i in range(2)] for j in range(len(train_dataset))] #creating list for OK or NOT_OK results. 2columns, a lot of rows [EXPECTED,PREDICTED]
-    matrix=list()
-    matrix=[[0 for i in range(2)] for j in range(2)]
 
     #start calculating
     for epoch in range(n_epoch): #calculate epoch times
@@ -57,17 +57,6 @@ def train_weights(train_dataset, l_rate, n_epoch, weights):
                 prediction=0
             error = row[-1] - prediction 
 
-            #at last epoch, take data into confusion matrix
-            if(epoch==n_epoch-1):
-                if row[-1]==0 and prediction==0:
-                    matrix[0][0]+=1 #tp_counter
-                elif row[-1]!=0 and prediction==0:
-                    matrix[0][1]+=1 #fp_counter
-                elif row[-1]==0 and prediction!=0:
-                    matrix[1][0]+=1 #fn_counter
-                elif row[-1]!=0 and prediction!=0:
-                    matrix[1][1]+=1 #tn_counter
-            
             #if expected!=predicted, update weights
             if error**2 == 1:
                 sum_error += error**2 
@@ -76,9 +65,6 @@ def train_weights(train_dataset, l_rate, n_epoch, weights):
                     weights[i + 1] = weights[i + 1] + l_rate * error * row[i] #w(t+1)= w(t) + learning_rate * (expected(t) - predicted(t)) * x(t)
         print('>epoch=%d, l_rate=%.3f, sum_error=%.3f' % (epoch, l_rate, sum_error))
     print(weights)
-    print ("\nLEGEND:","\n   0  1""\n0 TP|FP\n  -----\n1 FN|TN")
-    print("\n",matrix[0][0],"|",matrix[0][1],"\n-------\n",matrix[1][0],"|",matrix[1][1])
-
     return weights
 
 def validation_data_test(train_dataset, l_rate, n_epoch, weights):
@@ -87,38 +73,31 @@ def validation_data_test(train_dataset, l_rate, n_epoch, weights):
     matrix=list()
     matrix=[[0 for i in range(2)] for j in range(2)]
 
-    #start calculating
-    for epoch in range(n_epoch): #calculate epoch times
-        sum_error = 0.0
-        for row in train_dataset:
-            prediction = predict(row, weights)
-            if (prediction ==-1):
-                prediction=0
-            error = row[-1] - prediction 
+    for row in train_dataset:
+        prediction = predict(row, weights)
+        if (prediction ==-1):
+            prediction=0
+        #take data into confusion matrix
+        if row[-1]==0 and prediction==0:
+            matrix[0][0]+=1 #tp_counter
+        elif row[-1]!=0 and prediction==0:
+            matrix[0][1]+=1 #fp_counter
+        elif row[-1]==0 and prediction!=0:
+            matrix[1][0]+=1 #fn_counter
+        elif row[-1]!=0 and prediction!=0:
+            matrix[1][1]+=1 #tn_counter
 
-            #at last epoch, take data into confusion matrix
-            if(epoch==n_epoch-1):
-                if row[-1]==0 and prediction==0:
-                    matrix[0][0]+=1 #tp_counter
-                elif row[-1]!=0 and prediction==0:
-                    matrix[0][1]+=1 #fp_counter
-                elif row[-1]==0 and prediction!=0:
-                    matrix[1][0]+=1 #fn_counter
-                elif row[-1]!=0 and prediction!=0:
-                    matrix[1][1]+=1 #tn_counter
-            
-            #if expected!=predicted, update weights
-            if error**2 == 1:
-                sum_error += error**2 
-                weights[0] = weights[0] + l_rate * error # bias(t+1) = bias(t) + learning_rate * (expected(t) - predicted(t))
-                for i in range(len(row)-1):
-                    weights[i + 1] = weights[i + 1] + l_rate * error * row[i] #w(t+1)= w(t) + learning_rate * (expected(t) - predicted(t)) * x(t)
-        print('>epoch=%d, l_rate=%.3f, sum_error=%.3f' % (epoch, l_rate, sum_error))
-    print(weights)
     print ("\nLEGEND:","\n   0  1""\n0 TP|FP\n  -----\n1 FN|TN")
-    print("\n",matrix[0][0],"|",matrix[0][1],"\n-------\n",matrix[1][0],"|",matrix[1][1])
+    print("\n",matrix[0][0],"|",matrix[0][1],"\n-------\n",matrix[1][0],"|",matrix[1][1],"\n\n")
 
-    return weights
+
+def test_data_test(train_dataset, l_rate, n_epoch, weights):
+    for row in train_dataset:
+        prediction = predict(row, weights)
+        if (prediction ==-1):
+            prediction=0
+        print(row,"VALUE:", prediction)
+
 
 def perceptron_banknote_authentication(learning_rate, n_epoch,weights):
 
@@ -134,7 +113,8 @@ def perceptron_banknote_authentication(learning_rate, n_epoch,weights):
     #print(data)
     weights = train_weights(training_data, learning_rate, n_epoch,weights)
     validation_data_test(validation_data, learning_rate, n_epoch, weights)
-    
+    test_data_test(test_data, learning_rate, n_epoch, weights)
+
 # test predictions
 l_rate = 0.1
 n_epoch = 20
