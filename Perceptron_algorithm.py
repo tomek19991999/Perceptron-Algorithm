@@ -121,5 +121,3 @@ n_epoch = 20
 weights=[0.0,0.0,0.0,0.0,0.0] #weights[0] is bias
 
 perceptron_banknote_authentication(l_rate, n_epoch,weights)
-
-
