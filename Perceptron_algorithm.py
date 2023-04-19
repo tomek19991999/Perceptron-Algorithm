@@ -123,6 +123,3 @@ weights=[0.0,0.0,0.0,0.0,0.0] #weights[0] is bias
 perceptron_banknote_authentication(l_rate, n_epoch,weights)
 
 
-
-#podzielic na 2 zbiory: treningowy i testowy 80% i 20%
-# zmienic na -1 funkcja signum na returnie, zamiast 0. Czyli zwraca 1 albo -1 
